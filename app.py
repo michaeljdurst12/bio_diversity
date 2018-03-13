@@ -19,17 +19,21 @@ def sample_id():
 
 @app.route("/otu")
 def description():
-    # print(belly_data.count())
+    
     descriptions = list(belly_data["Lowest Taxonomic Level of Bacteria/Archaea Found"])
     return jsonify(descriptions)
 
-@app.route("/metadata/<sample>")
-def metadata_data(sample):
-    print("in python sample=", sample)
-    # datas = (meta_2.loc[:, "SAMPLEID":"LOCATION"]).to_json()
-    # return(datas)
-    return jsonify("5")
+@app.route("/metadata/<sample_id>")
+def metadata(sample_id):
+    sample_id = int(sample_id.replace("BB_", ""))
+    match = meta[meta['SAMPLEID'] == sample_id][['SAMPLEID', 'ETHNICITY', 'GENDER', 'AGE', 'LOCATION','BBTYPE']].to_dict(orient='records')[0]
+    return jsonify(match)
 
+@app.route("/sample/<sample_id>")
+def choosen_sample(sample_id):
+    df = samples[['otu_id', sample_id]].sort_values(sample_id, ascending=False).dropna().rename(
+        columns={sample_id: "sample_values"}).to_dict(orient='list')
+    return jsonify(df)
 
 
 
